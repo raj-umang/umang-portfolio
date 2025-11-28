@@ -61,28 +61,28 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 lg:py-32">
+    <section id="contact" className="py-20 lg:py-32" data-testid="section-contact">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold tracking-tight mb-4" data-testid="text-contact-title">
             Get in Touch
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto" data-testid="text-contact-description">
             Have a project in mind or want to discuss opportunities? I'd love to hear from you.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-12">
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8" data-testid="container-contact-info">
             <div>
-              <h3 className="text-xl font-semibold mb-4">Let's Connect</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-xl font-semibold mb-4" data-testid="text-contact-subtitle">Let's Connect</h3>
+              <p className="text-muted-foreground leading-relaxed" data-testid="text-contact-intro">
                 I'm always interested in hearing about new projects, creative ideas, or opportunities to be part of your vision.
               </p>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-muted-foreground">
+              <div className="flex items-center gap-3 text-muted-foreground" data-testid="contact-email-info">
                 <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                   <Mail className="h-5 w-5" />
                 </div>
@@ -98,18 +98,18 @@ export function ContactSection() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 text-muted-foreground">
+              <div className="flex items-center gap-3 text-muted-foreground" data-testid="contact-location-info">
                 <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Location</p>
-                  <p className="font-medium text-foreground">San Francisco, CA</p>
+                  <p className="font-medium text-foreground" data-testid="text-contact-location">San Francisco, CA</p>
                 </div>
               </div>
             </div>
 
-            <div>
+            <div data-testid="container-social-links">
               <p className="text-sm text-muted-foreground mb-4">Follow me on</p>
               <div className="flex items-center gap-2">
                 {socialLinks.map((link) => (
@@ -134,16 +134,16 @@ export function ContactSection() {
             </div>
           </div>
 
-          <Card className="lg:col-span-3 p-6 lg:p-8">
+          <Card className="lg:col-span-3 p-6 lg:p-8" data-testid="card-contact-form">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="form-contact">
                 <div className="grid sm:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel data-testid="label-contact-name">Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Your name"
@@ -151,7 +151,7 @@ export function ContactSection() {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage data-testid="error-contact-name" />
                       </FormItem>
                     )}
                   />
@@ -160,7 +160,7 @@ export function ContactSection() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel data-testid="label-contact-email">Email</FormLabel>
                         <FormControl>
                           <Input
                             type="email"
@@ -169,7 +169,7 @@ export function ContactSection() {
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage data-testid="error-contact-email" />
                       </FormItem>
                     )}
                   />
@@ -180,7 +180,7 @@ export function ContactSection() {
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Message</FormLabel>
+                      <FormLabel data-testid="label-contact-message">Message</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Tell me about your project or inquiry..."
@@ -189,7 +189,7 @@ export function ContactSection() {
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage data-testid="error-contact-message" />
                     </FormItem>
                   )}
                 />

@@ -24,7 +24,7 @@ export function Navigation() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border" data-testid="header-navigation">
       <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         <a
           href="#"
@@ -38,7 +38,7 @@ export function Navigation() {
           UR
         </a>
 
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1" data-testid="nav-desktop-menu">
           {navItems.map((item) => (
             <Button
               key={item.href}
@@ -69,7 +69,7 @@ export function Navigation() {
       </nav>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-background border-b border-border">
+        <div className="md:hidden bg-background border-b border-border" data-testid="nav-mobile-menu">
           <div className="px-6 py-4 flex flex-col gap-2">
             {navItems.map((item) => (
               <Button

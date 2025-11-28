@@ -20,6 +20,7 @@ export function HeroSection() {
     <section
       id="about"
       className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
+      data-testid="section-hero"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/10 dark:from-primary/10 dark:to-accent/5" />
       
@@ -30,7 +31,7 @@ export function HeroSection() {
       <div className="max-w-6xl mx-auto px-6 py-20 relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6" data-testid="badge-availability">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               Available for opportunities
             </div>
@@ -68,13 +69,13 @@ export function HeroSection() {
               </Button>
             </div>
 
-            <div className="flex items-center gap-4 justify-center lg:justify-start">
+            <div className="flex items-center gap-4 justify-center lg:justify-start" data-testid="list-social-links">
               <a
                 href="https://github.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground transition-colors"
-                data-testid="link-github"
+                data-testid="link-hero-github"
               >
                 <Button variant="ghost" size="icon">
                   <Github className="h-5 w-5" />
@@ -85,7 +86,7 @@ export function HeroSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground transition-colors"
-                data-testid="link-linkedin"
+                data-testid="link-hero-linkedin"
               >
                 <Button variant="ghost" size="icon">
                   <Linkedin className="h-5 w-5" />
@@ -94,7 +95,7 @@ export function HeroSection() {
               <a
                 href="mailto:umang@example.com"
                 className="text-muted-foreground transition-colors"
-                data-testid="link-email"
+                data-testid="link-hero-email"
               >
                 <Button variant="ghost" size="icon">
                   <Mail className="h-5 w-5" />
@@ -103,10 +104,10 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0" data-testid="container-hero-avatar">
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-2xl opacity-60" />
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-border">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-border" data-testid="img-hero-avatar">
                 <span className="text-6xl sm:text-7xl lg:text-8xl font-bold text-primary/80">UR</span>
               </div>
             </div>
@@ -114,7 +115,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" data-testid="icon-scroll-indicator">
         <ArrowDown className="h-6 w-6 text-muted-foreground" />
       </div>
     </section>
