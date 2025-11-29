@@ -2,6 +2,8 @@ import { drizzle } from "drizzle-orm/neon-serverless";
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import * as schema from "@shared/schema";
 import ws from "ws";
+import dotenv from "dotenv";
+dotenv.config();
 
 neonConfig.webSocketConstructor = ws;
 
