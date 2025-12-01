@@ -15,7 +15,8 @@ declare module "http" {
 app.use(
   express.json({
     verify: (req, _res, buf) => {
-      req.rawBody = buf;
+      // store raw body safely
+      (req as any).rawBody = buf;
     },
   })
 );
@@ -33,15 +34,16 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
+/* Request logger middleware */
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
+  const originalResJson = res.json.bind(res);
+  res.json = function (bodyJson: any, ...args: any[]) {
     capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
+    return originalResJson(bodyJson, ...args);
   };
 
   res.on("finish", () => {
@@ -49,9 +51,12 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+        try {
+          logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+        } catch {
+          // ignore stringify errors
+        }
       }
-
       log(logLine);
     }
   });
@@ -59,41 +64,79 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  // Run database seed
+/* Graceful error handler - do NOT throw after sending response */
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err?.status || err?.statusCode || 500;
+  const message = err?.message || "Internal Server Error";
+  log(`Error: ${message} (status ${status})`, "error");
+  // make sure to send a JSON error response but do not crash the process
   try {
-    const { seed } = await import("./seed");
-    await seed();
-  } catch (error) {
-    console.error("Failed to seed database:", error);
-  }
-
-  await registerRoutes(httpServer, app);
-
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
     res.status(status).json({ message });
-    throw err;
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (process.env.NODE_ENV === "production") {
-    serveStatic(app);
-  } else {
-    const { setupVite } = await import("./vite");
-    await setupVite(httpServer, app);
+  } catch {
+    // if sending response fails, just log
+    log("Failed to send error response", "error");
   }
+});
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || "5000", 10);
-  httpServer.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
-  });
+/* Main startup */
+(async () => {
+  try {
+    // Optional seed (already protected by try/catch in your earlier code)
+    try {
+      const { seed } = await import("./seed");
+      await seed();
+    } catch (e) {
+      log(`Seed step skipped/failed: ${(e as Error).message}`, "seed");
+    }
+
+    await registerRoutes(httpServer, app);
+
+    // serve static only in production
+    if (process.env.NODE_ENV === "production") {
+      serveStatic(app);
+    } else {
+      const { setupVite } = await import("./vite");
+      await setupVite(httpServer, app);
+    }
+
+    // listen on Railway-provided port; default to 8080
+    const port = Number(process.env.PORT || 8080);
+    // bind to 0.0.0.0 so external checks can reach the container
+    httpServer.listen(port, "0.0.0.0", () => {
+      log(`serving on port ${port}`);
+    });
+
+    // Graceful shutdown handlers
+    const shutdown = (signal: string) => {
+      return async () => {
+        log(`Received ${signal}. Shutting down gracefully...`, "shutdown");
+        try {
+          httpServer.close(() => {
+            log("HTTP server closed.", "shutdown");
+            // process.exit will be handled by platform; but exit to be safe
+            process.exit(0);
+          });
+        } catch (err) {
+          log(`Error during shutdown: ${(err as Error).message}`, "shutdown");
+          process.exit(1);
+        }
+      };
+    };
+
+    process.on("SIGTERM", shutdown("SIGTERM"));
+    process.on("SIGINT", shutdown("SIGINT"));
+
+    // Optional: catch unhandled rejections and log (avoid crash)
+    process.on("unhandledRejection", (reason) => {
+      log(`Unhandled Rejection: ${JSON.stringify(reason)}`, "process");
+    });
+    process.on("uncaughtException", (err) => {
+      log(`Uncaught Exception: ${(err as Error).message}`, "process");
+      // For uncaughtException you may want to exit; here we log and let platform restart.
+    });
+  } catch (startupErr) {
+    log(`Startup failed: ${(startupErr as Error).message}`, "startup");
+    // ensure that if startup fails, we exit with non-zero so Railway restarts
+    process.exit(1);
+  }
 })();
